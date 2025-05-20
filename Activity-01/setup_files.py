@@ -1,4 +1,3 @@
-# setup_files.py
 from pathlib import Path
 import random, string
 
@@ -20,4 +19,4 @@ for i in range(5):
         content = ''.join(random.choices(string.ascii_letters + string.digits, k=100))
         filename.write_text(content)
 
-print(f"Test directories and files created under: {BASE.resolve()}") 
+print(f"Test directories and files created under: {BASE.resolve()}")

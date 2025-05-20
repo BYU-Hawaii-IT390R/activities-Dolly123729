@@ -1,8 +1,7 @@
 from pathlib import Path
 import argparse
-import csv  # 👈 Add this import
 
-def scan_txt_files(directory):
+def scan_txt_files(directory, min_size_kb):
     directory = Path(directory)
     if not directory.exists():
         print("Directory does not exist.")
@@ -17,27 +16,22 @@ def scan_txt_files(directory):
     print("-" * 52)
 
     total_size = 0
-    rows = []  # 👈 This will store data for CSV
+    matching_files = 0
     for file in txt_files:
         size_kb = file.stat().st_size / 1024
-        total_size += size_kb
-        relative_path = str(file.relative_to(directory))
-        print(f"{relative_path:<40} {size_kb:>10.1f}")
-        rows.append([relative_path, f"{size_kb:.1f}"])  # 👈 Save for CSV
+        if size_kb >= min_size_kb:
+            total_size += size_kb
+            print(f"{str(file.relative_to(directory)):<40} {size_kb:>10.1f}")
+            matching_files += 1
 
     print("-" * 52)
+    print(f"Total matching files: {matching_files}")
     print(f"Total size: {total_size:.1f} KB\n")
-
-    # 👇 Write to output.csv
-    with open("output.csv", "w", newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(["file", "size_kb"])
-        writer.writerows(rows)
-
-    print("Results written to output.csv ✅")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Recursively scan directory for .txt files.")
     parser.add_argument("path", help="Path to directory to scan")
+    parser.add_argument("--min-size", type=float, default=0.0, help="Minimum file size in KB to include")
     args = parser.parse_args()
-    scan_txt_files(args.path)
+
+    scan_txt_files(args.path, args.min_size)
